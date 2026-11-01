@@ -1,6 +1,5 @@
-Feature: Calculator
+Feature: Flipkart scripts
 
-Simple calculator for adding two numbers
 
 @mytag
 Scenario: Launch flipkart homepage 
