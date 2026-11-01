@@ -1,5 +1,5 @@
 ﻿using FlipkartProj.Drivers;
-using Microsoft.Playwright;
+using FlipkartProj.Support;
 using Reqnroll;
 using Reqnroll.BoDi;
 
@@ -11,6 +11,7 @@ namespace FlipkartProj.Hooks
         private readonly IObjectContainer _container;
         private readonly ScenarioContext _scenarioContext;
         private PlaywrightDriver _driver = default!;
+        private int _stepCounter;
 
         public TestHooks(IObjectContainer container, ScenarioContext scenarioContext)
         {
@@ -22,26 +23,33 @@ namespace FlipkartProj.Hooks
         public async Task BeforeScenario()
         {
             _driver = new PlaywrightDriver();
-            await _driver.InitializeAsync();          // launches Chrome
+            await _driver.InitializeAsync();
 
             _container.RegisterInstanceAs(_driver);
-            _container.RegisterInstanceAs(_driver.Page);   // makes IPage injectable
+            _container.RegisterInstanceAs(_driver.Page);
+        }
+
+        [AfterStep]
+        public async Task AfterStep()
+        {
+            _stepCounter++;
+
+            var stepText = _scenarioContext.StepContext.StepInfo.Text;
+            var status = _scenarioContext.TestError == null ? "" : "_FAILED";
+
+            var path = await ScreenshotHelper.CaptureAsync(
+                _driver.Page,
+                _scenarioContext.ScenarioInfo.Title,
+                _stepCounter,
+                stepText + status);
+
+            // Shows the screenshot path in the test output
+            Console.WriteLine($"Screenshot: {path}");
         }
 
         [AfterScenario]
         public async Task AfterScenario()
         {
-            if (_scenarioContext.TestError != null)
-            {
-                Directory.CreateDirectory("Screenshots");
-                var name = _scenarioContext.ScenarioInfo.Title.Replace(" ", "_");
-                await _driver.Page.ScreenshotAsync(new PageScreenshotOptions
-                {
-                    Path = $"Screenshots/{name}.png",
-                    FullPage = true
-                });
-            }
-
             await _driver.DisposeAsync();
         }
     }
