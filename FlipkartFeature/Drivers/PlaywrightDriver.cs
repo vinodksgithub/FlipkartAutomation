@@ -31,23 +31,7 @@ namespace FlipkartProj.Drivers
             Context.SetDefaultTimeout(30000);
             Context.SetDefaultNavigationTimeout(60000);
 
-            // Optional: start trace (saved on failure in the hook)
-            await Context.Tracing.StartAsync(new TracingStartOptions
-            {
-                Screenshots = true,
-                Snapshots = true,
-                Sources = true
-            });
-
             Page = await Context.NewPageAsync();
-        }
-
-        public async Task StopTracingAsync(string? tracePath = null)
-        {
-            if (tracePath is null)
-                await Context.Tracing.StopAsync();
-            else
-                await Context.Tracing.StopAsync(new TracingStopOptions { Path = tracePath });
         }
 
         public async ValueTask DisposeAsync()
