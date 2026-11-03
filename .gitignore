@@ -1,0 +1,45 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.vscode/
+.idea/
+
+# Test results
+TestResults/
+[Tt]est[Rr]esult*/
+*.trx
+*.coverage
+
+# NuGet
+*.nupkg
+packages/
+.nuget/
+
+# Reqnroll / SpecFlow generated files
+*.feature.cs
+
+# Playwright artifacts
+Screenshots/
+Traces/
+Videos/
+playwright-report/
+test-results/
+
+# Logs and reports
+Logs/
+Reports/
+*.log
+allure-results/
+allure-report/
+
+# OS files
+.DS_Store
+Thumbs.db

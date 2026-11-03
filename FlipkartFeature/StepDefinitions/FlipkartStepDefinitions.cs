@@ -32,5 +32,11 @@ namespace FlipkartProj.StepDefinitions
             bool isDisplayed = await _homePage.IsHomePageDisplayedAsync();
             Assert.That(isDisplayed, Is.True, "Flipkart home page was not displayed");
         }
+
+        [When("User Inputs {string} in search")]
+        public async Task WhenUserInputsInSearch(string searchTerm)
+        {
+            await _homePage.SearchAsync(searchTerm);
+        }
     }
 }

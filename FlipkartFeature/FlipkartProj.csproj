@@ -19,10 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Support\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="Config\appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
