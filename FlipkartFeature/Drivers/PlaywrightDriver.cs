@@ -1,4 +1,5 @@
 ﻿using Microsoft.Playwright;
+using FlipkartProj.Config;
 
 namespace FlipkartProj.Drivers
 {
@@ -16,7 +17,7 @@ namespace FlipkartProj.Drivers
 
             _browser = await _playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
             {
-                Headless = headless,
+                Headless = ConfigReader.Settings.Headless,
                 Channel = "chrome",          // uses installed Google Chrome
                 SlowMo = 0,
                 Args = new[] { "--start-maximized" }
