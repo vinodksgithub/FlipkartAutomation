@@ -7,5 +7,9 @@
         public bool Headless { get; set; } = false;
         public int SlowMo { get; set; } = 0;
         public int DefaultTimeoutMs { get; set; } = 30000;
+        public string ApiBaseUrl { get; set; } = "https://restful-booker.herokuapp.com/";
+        public string ApiUsername { get; set; } = "admin";
+        public string ApiPassword { get; set; } = "password123";
+
     }
 }
