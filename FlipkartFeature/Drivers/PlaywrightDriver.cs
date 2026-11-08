@@ -19,7 +19,7 @@ namespace FlipkartProj.Drivers
             {
                 Headless = ConfigReader.Settings.Headless,
                 Channel = "chrome",          // uses installed Google Chrome
-                SlowMo = 0,
+                SlowMo = ConfigReader.Settings.SlowMo,
                 Args = new[] { "--start-maximized" }
             });
 
