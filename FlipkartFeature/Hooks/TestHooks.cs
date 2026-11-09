@@ -10,7 +10,7 @@ namespace FlipkartProj.Hooks
     {
         private readonly IObjectContainer _container;
         private readonly ScenarioContext _scenarioContext;
-        private PlaywrightDriver _driver = default!;
+        private PlaywrightDriver? _driver;
         private int _stepCounter;
 
         public TestHooks(IObjectContainer container, ScenarioContext scenarioContext)
@@ -19,9 +19,15 @@ namespace FlipkartProj.Hooks
             _scenarioContext = scenarioContext;
         }
 
-        [BeforeScenario]
+        private bool IsApiScenario =>
+            _scenarioContext.ScenarioInfo.CombinedTags.Any(t => t.Equals("api", StringComparison.OrdinalIgnoreCase));
+
+
+        [BeforeScenario(Order = 0)]
         public async Task BeforeScenario()
         {
+            if (IsApiScenario) return;          // no browser for API tests
+
             _driver = new PlaywrightDriver();
             await _driver.InitializeAsync();
 
@@ -29,9 +35,12 @@ namespace FlipkartProj.Hooks
             _container.RegisterInstanceAs(_driver.Page);
         }
 
+        
         [AfterStep]
         public async Task AfterStep()
         {
+            if (IsApiScenario || _driver is null) return;   // skip screenshots for API tests
+
             _stepCounter++;
 
             var stepText = _scenarioContext.StepContext.StepInfo.Text;
@@ -43,14 +52,15 @@ namespace FlipkartProj.Hooks
                 _stepCounter,
                 stepText + status);
 
-            // Shows the screenshot path in the test output
             Console.WriteLine($"Screenshot: {path}");
         }
+
 
         [AfterScenario]
         public async Task AfterScenario()
         {
-            await _driver.DisposeAsync();
+            if (_driver is not null)
+                await _driver.DisposeAsync();
         }
     }
 }
