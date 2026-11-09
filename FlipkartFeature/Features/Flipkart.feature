@@ -1,7 +1,7 @@
+@UI
 Feature: Flipkart scripts
 
 
-@mytag
 Scenario: Launch flipkart homepage 
 	Given User launches webpage 
 	And User closes any popup open in homepage
