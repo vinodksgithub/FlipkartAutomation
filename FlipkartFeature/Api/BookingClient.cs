@@ -31,5 +31,26 @@ namespace FlipkartProj.Api
             Console.WriteLine($"Status  : {response.Status}");
             Console.WriteLine($"Response: {await response.TextAsync()}");
         }
+
+        public async Task<IAPIResponse> GetAsync(int bookingId)
+        {
+            var response = await _api.Request.GetAsync($"booking/{bookingId}");
+            await LogAsync($"GET booking/{bookingId}", null, response);
+            return response;
+        }
+
+        public async Task<IAPIResponse> SearchByNameAsync(string firstName, string lastName)
+        {
+            var response = await _api.Request.GetAsync("booking", new APIRequestContextOptions
+            {
+                Params = new Dictionary<string, object>
+                {
+                    ["firstname"] = firstName,
+                    ["lastname"] = lastName
+                }
+            });
+            await LogAsync("GET booking (search by name)", null, response);
+            return response;
+        }
     }
 }
