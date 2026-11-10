@@ -23,6 +23,20 @@ namespace FlipkartProj.Api
             return response;
         }
 
+        public async Task<IAPIResponse> UpdateLastNameAsync(int bookingId, string newLastName, string token)
+        {
+            var body = new Dictionary<string, object> { ["lastname"] = newLastName };
+
+            var response = await _api.Request.PatchAsync($"booking/{bookingId}", new APIRequestContextOptions
+            {
+                DataObject = body,
+                Headers = new Dictionary<string, string> { ["Cookie"] = $"token={token}" }
+            });
+
+            await LogAsync($"PATCH booking/{bookingId}", body, response);
+            return response;
+        }
+
         private static async Task LogAsync(string title, object? requestBody, IAPIResponse response)
         {
             Console.WriteLine($"--- {title} ---");
@@ -50,6 +64,17 @@ namespace FlipkartProj.Api
                 }
             });
             await LogAsync("GET booking (search by name)", null, response);
+            return response;
+        }
+
+        public async Task<IAPIResponse> DeleteAsync(int bookingId, string token)
+        {
+            var response = await _api.Request.DeleteAsync($"booking/{bookingId}", new APIRequestContextOptions
+            {
+                Headers = new Dictionary<string, string> { ["Cookie"] = $"token={token}" }
+            });
+
+            await LogAsync($"DELETE booking/{bookingId}", null, response);
             return response;
         }
     }
