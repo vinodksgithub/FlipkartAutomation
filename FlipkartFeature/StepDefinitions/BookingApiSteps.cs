@@ -1,6 +1,7 @@
 ﻿using FlipkartProj.Api;
 using FlipkartProj.Entities;
 using FlipkartProj.Support;
+using FlipkartProj.Support.Data;
 using NUnit.Framework;
 using Reqnroll;
 
@@ -13,10 +14,13 @@ namespace FlipkartProj.StepDefinitions
         private readonly BookingClient _bookingClient;
         private readonly BookingContext _ctx;
 
-        public BookingApiSteps(ApiDriver api, BookingClient bookingClient, BookingContext ctx)
+        private readonly AuthClient _authClient;
+
+        public BookingApiSteps(ApiDriver api, BookingClient bookingClient, AuthClient authClient, BookingContext ctx)
         {
             _api = api;
             _bookingClient = bookingClient;
+            _authClient = authClient;
             _ctx = ctx;
         }
 
@@ -96,6 +100,68 @@ namespace FlipkartProj.StepDefinitions
             var ids = await search.JsonAsync<List<BookingIdItem>>();
             Assert.That(ids!.Select(i => i.BookingId), Does.Contain(_ctx.BookingId),
                 $"Booking ID {_ctx.BookingId} was not found when searching by name");
+        }
+
+        [When("the booking last name is updated")]
+        public async Task WhenTheBookingLastNameIsUpdated()
+        {
+            _ctx.Token ??= await _authClient.GetTokenAsync();
+
+            _ctx.UpdatedLastName = $"Updated{new Random().Next(1000, 9999)}";
+            _ctx.LastResponse = await _bookingClient.UpdateLastNameAsync(
+                _ctx.BookingId, _ctx.UpdatedLastName, _ctx.Token);
+        }
+
+        [Then("the response should show the updated last name")]
+        public async Task ThenTheResponseShouldShowTheUpdatedLastName()
+        {
+            var response = _ctx.LastResponse!;
+            Assert.That(response.Status, Is.EqualTo(200),
+                $"Update failed: {await response.TextAsync()}");
+
+            var updated = await response.JsonAsync<Booking>();
+            Assert.Multiple(() =>
+            {
+                Assert.That(updated!.LastName, Is.EqualTo(_ctx.UpdatedLastName), "Last name in PATCH response");
+                // Fields we didn't touch must be unchanged
+                Assert.That(updated.FirstName, Is.EqualTo(_ctx.Submitted.FirstName), "First name should not change");
+                Assert.That(updated.TotalPrice, Is.EqualTo(_ctx.Submitted.TotalPrice), "Price should not change");
+            });
+
+            // Confirm the change was actually saved
+            var check = await _bookingClient.GetAsync(_ctx.BookingId);
+            var saved = await check.JsonAsync<Booking>();
+            Assert.That(saved!.LastName, Is.EqualTo(_ctx.UpdatedLastName), "Last name was not persisted");
+        }
+
+        [When("the booking is deleted")]
+        public async Task WhenTheBookingIsDeleted()
+        {
+            _ctx.Token ??= await _authClient.GetTokenAsync();
+            _ctx.LastResponse = await _bookingClient.DeleteAsync(_ctx.BookingId, _ctx.Token);
+        }
+
+        [Then("the delete response should be {int}")]
+        public async Task ThenTheDeleteResponseShouldBe(int expectedStatus)
+        {
+            var response = _ctx.LastResponse!;
+            Assert.That(response.Status, Is.EqualTo(expectedStatus),
+                $"Delete returned {response.Status}: {await response.TextAsync()}");
+        }
+
+        [When("the deleted booking is retrieved")]
+        public async Task WhenTheDeletedBookingIsRetrieved()
+        {
+            _ctx.LastResponse = await _bookingClient.GetAsync(_ctx.BookingId);
+        }
+
+        [Then("the response should be {int} Not Found")]
+        public async Task ThenTheResponseShouldBeNotFound(int expectedStatus)
+        {
+            var response = _ctx.LastResponse!;
+            Assert.That(response.Status, Is.EqualTo(expectedStatus),
+                $"Expected {expectedStatus} for deleted booking {_ctx.BookingId} but got " +
+                $"{response.Status}: {await response.TextAsync()}");
         }
     }
 }
