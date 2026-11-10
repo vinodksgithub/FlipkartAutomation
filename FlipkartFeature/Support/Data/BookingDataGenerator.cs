@@ -1,6 +1,6 @@
 ﻿using FlipkartProj.Entities;
 
-namespace FlipkartProj.Support
+namespace FlipkartProj.Support.Data
 {
     public static class BookingDataGenerator
     {
@@ -13,7 +13,7 @@ namespace FlipkartProj.Support
             { "Sharma", "Iyer", "Kumar", "Patel", "Nair", "Reddy", "Gupta", "Menon" };
 
         private static readonly string[] Needs =
-            { "Breakfast", "Late checkout", "Airport pickup", "Extra bed" };
+            { "Breakfast", "Late checkout", "Airport pickup", "Extra bed" , "Must visit spots"};
 
         public static Booking Create()
         {
