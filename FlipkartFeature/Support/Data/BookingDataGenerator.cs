@@ -2,6 +2,7 @@
 
 namespace FlipkartProj.Support.Data
 {
+    // random data generator 
     public static class BookingDataGenerator
     {
         private static readonly Random Rng = new();
@@ -13,7 +14,7 @@ namespace FlipkartProj.Support.Data
             { "Sharma", "Iyer", "Kumar", "Patel", "Nair", "Reddy", "Gupta", "Menon" };
 
         private static readonly string[] Needs =
-            { "Breakfast", "Late checkout", "Airport pickup", "Extra bed" , "Must visit spots"};
+            { "Breakfast", "Airport pickup", "Extra bed" , "Must visit spots","Late checkout"};
 
         public static Booking Create()
         {
